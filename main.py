@@ -3,8 +3,6 @@ import time
 import random
 import pygame.mixer
 
-pygame.mixer.init()
-
 pygame.init()
 white = (255, 255, 255)
 yellow = (255, 255, 102)
@@ -15,12 +13,17 @@ blue = (50, 153, 213)
 dis_width = 800
 dis_height = 600
 dis = pygame.display.set_mode((dis_width, dis_height))
-pygame.display.set_caption('Змейка от Skillbox')
+pygame.display.set_caption('Змейка')
 clock = pygame.time.Clock()
 snake_block = 10
 snake_speed = 15
 font_style = pygame.font.SysFont("bahnschrift", 25)
 score_font = pygame.font.SysFont("comicsansms", 35)
+
+pygame.mixer.init()
+death_sound = pygame.mixer.Sound('music/overau.mp3')
+good_sound = pygame.mixer.Sound('music/plusau.mp3')
+pygame.mixer.music.load('music/gameau.mp3')
 
 
 def Your_score(score):
@@ -39,18 +42,19 @@ def message(msg, color):
 
 
 def gameLoop():
+    pygame.mixer.music.play(-1)
     game_over = False
     game_close = False
     x1 = dis_width / 2
     y1 = dis_height / 2
     x1_change = 0
     y1_change = 0
-    snake_List = []
+    snake_List = list()
     Length_of_snake = 1
     foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
     foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
     while not game_over:
-        while game_close == True:
+        while game_close:
             dis.fill(blue)
             message("Вы проиграли! Нажмите Q для выхода или C для повторной игры", red)
             Your_score(Length_of_snake - 1)
@@ -79,12 +83,13 @@ def gameLoop():
                     y1_change = snake_block
                     x1_change = 0
         if x1 >= dis_width or x1 < 0 or y1 >= dis_height or y1 < 0:
+            death_sound.play()
             game_close = True
         x1 += x1_change
         y1 += y1_change
         dis.fill(blue)
         pygame.draw.rect(dis, green, [foodx, foody, snake_block, snake_block])
-        snake_Head = []
+        snake_Head = list()
         snake_Head.append(x1)
         snake_Head.append(y1)
         snake_List.append(snake_Head)
@@ -92,6 +97,7 @@ def gameLoop():
             del snake_List[0]
         for x in snake_List[:-1]:
             if x == snake_Head:
+                death_sound.play()
                 game_close = True
         our_snake(snake_block, snake_List)
         Your_score(Length_of_snake - 1)
@@ -100,9 +106,13 @@ def gameLoop():
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
             foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
             Length_of_snake += 1
+            good_sound.play()
         clock.tick(snake_speed)
     pygame.quit()
     quit()
 
 
 gameLoop()
+
+
+
