@@ -2,6 +2,7 @@ import pygame
 import time
 import random
 import pygame.mixer
+from menu import give_sound
 
 pygame.init()
 white = (255, 255, 255)
@@ -23,7 +24,6 @@ score_font = pygame.font.SysFont("comicsansms", 35)
 pygame.mixer.init()
 death_sound = pygame.mixer.Sound('music/overau.mp3')
 good_sound = pygame.mixer.Sound('music/plusau.mp3')
-pygame.mixer.music.load('music/gameau.mp3')
 
 
 def Your_score(score):
@@ -42,6 +42,7 @@ def message(msg, color):
 
 
 def gameLoop():
+    pygame.mixer.music.load(f'music/gameau.mp3')
     pygame.mixer.music.play(-1)
     game_over = False
     game_close = False
@@ -110,9 +111,3 @@ def gameLoop():
         clock.tick(snake_speed)
     pygame.quit()
     quit()
-
-
-gameLoop()
-
-
-
