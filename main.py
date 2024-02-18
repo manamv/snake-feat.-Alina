@@ -1,8 +1,8 @@
 import pygame
-import time
 import random
 import pygame.mixer
-from menu import give_sound
+import sqlite3
+import datetime
 
 pygame.init()
 white = (255, 255, 255)
@@ -10,7 +10,7 @@ yellow = (255, 255, 102)
 black = (0, 0, 0)
 red = (213, 50, 80)
 green = (0, 255, 0)
-blue = (50, 153, 213)
+blue = (70, 130, 180)
 dis_width = 800
 dis_height = 600
 dis = pygame.display.set_mode((dis_width, dis_height))
@@ -26,11 +26,13 @@ death_sound = pygame.mixer.Sound('music/overau.mp3')
 good_sound = pygame.mixer.Sound('music/plusau.mp3')
 
 
-def Your_score(score):
+# выводит счёт
+def your_score(score):
     value = score_font.render("Ваш счёт: " + str(score), True, yellow)
     dis.blit(value, [0, 0])
 
 
+# движение змейки
 def our_snake(snake_block, snake_list):
     for x in snake_list:
         pygame.draw.rect(dis, black, [x[0], x[1], snake_block, snake_block])
@@ -41,8 +43,9 @@ def message(msg, color):
     dis.blit(mesg, [dis_width / 6, dis_height / 3])
 
 
-def gameLoop():
-    pygame.mixer.music.load(f'music/gameau.mp3')
+# основной функционал игры
+def game_loop():
+    pygame.mixer.music.load(f'music/gameau3.mp3')
     pygame.mixer.music.play(-1)
     game_over = False
     game_close = False
@@ -50,15 +53,15 @@ def gameLoop():
     y1 = dis_height / 2
     x1_change = 0
     y1_change = 0
-    snake_List = list()
-    Length_of_snake = 1
+    snake_list = list()
+    length_of_snake = 1
     foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
     foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
     while not game_over:
         while game_close:
             dis.fill(blue)
             message("Вы проиграли! Нажмите Q для выхода или C для повторной игры", red)
-            Your_score(Length_of_snake - 1)
+            your_score(length_of_snake - 1)
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
@@ -66,7 +69,7 @@ def gameLoop():
                         game_over = True
                         game_close = False
                     if event.key == pygame.K_c:
-                        gameLoop()
+                        game_loop()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
@@ -90,24 +93,45 @@ def gameLoop():
         y1 += y1_change
         dis.fill(blue)
         pygame.draw.rect(dis, green, [foodx, foody, snake_block, snake_block])
-        snake_Head = list()
-        snake_Head.append(x1)
-        snake_Head.append(y1)
-        snake_List.append(snake_Head)
-        if len(snake_List) > Length_of_snake:
-            del snake_List[0]
-        for x in snake_List[:-1]:
-            if x == snake_Head:
+        snake_head = list()
+        snake_head.append(x1)
+        snake_head.append(y1)
+        snake_list.append(snake_head)
+        if len(snake_list) > length_of_snake:
+            del snake_list[0]
+        for x in snake_list[:-1]:
+            if x == snake_head:
                 death_sound.play()
                 game_close = True
-        our_snake(snake_block, snake_List)
-        Your_score(Length_of_snake - 1)
+        our_snake(snake_block, snake_list)
+        your_score(length_of_snake - 1)
         pygame.display.update()
         if x1 == foodx and y1 == foody:
             foodx = round(random.randrange(0, dis_width - snake_block) / 10.0) * 10.0
             foody = round(random.randrange(0, dis_height - snake_block) / 10.0) * 10.0
-            Length_of_snake += 1
+            length_of_snake += 1
             good_sound.play()
         clock.tick(snake_speed)
     pygame.quit()
+    conn = sqlite3.connect('scores.db')
+    conn.execute("INSERT INTO scores (date, score) VALUES (?, ?)",
+                 (datetime.date.today().strftime("%d.%m"), length_of_snake - 1))
+    conn.commit()
+    conn.close()
     quit()
+
+
+# назначить музыку
+def mus_giv():
+    pass
+
+
+# сбор статистики
+def get_stats():
+    conn = sqlite3.connect('scores.db')
+    cursor = conn.execute("SELECT date, score FROM scores")
+    stat = ''
+    for row in cursor:
+        stat += f"{row[0]}: {row[1]}\n"
+    conn.close()
+    return stat

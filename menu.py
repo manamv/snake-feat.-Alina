@@ -1,51 +1,46 @@
 import pygame
 import pygame_menu as pm
-from main import gameLoop
+from main import game_loop, get_stats
 import pygame.mixer
 
-pygame.mixer.init()
-menu_sound = pygame.mixer.music.load('music/menuau.mp3')
+# Импортирование и инициализация Pygame
 pygame.init()
-
 WIDTH, HEIGHT = 700, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-# Standard RGB colors
+# Стандартные цвета RGB
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
-CYAN = (0, 100, 100)
+CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 
-# Main function of the program
-
-
+# Главная функция программы
 def main():
+    pygame.mixer.init()
+    pygame.mixer.music.load('music/menuau.mp3')
     pygame.mixer.music.play(-1)
-    # List that is displayed while selecting the difficulty
+
+    # Список, который отображается при выборе сложности
     colors = [("Черный", "Черный"),
               ("Розовый", "Розовый"),
               ("Фиолетовый", "Фиолетовый")]
 
-    # List that is displayed while selecting the player's perspective
+    # Список, который отображается при выборе перспективы игрока
     music = [("1", "1"),
              ("2", "2"),
              ("3", "3")]
 
-    # This function displays the currently selected options
-
-    def printSettings():
+    # Функция отображения выбранных настроек
+    def print_settings():
         print("\n\n")
-        # getting the data using "get_input_data" method of the Menu class
-        settingsData = settings.get_input_data()
+        settings_data = settings.get_input_data()
+        for key in settings_data.keys():
+            print(f"{key}\t:\t{settings_data[key]}")
 
-        for key in settingsData.keys():
-            print(f"{key}\t:\t{settingsData[key]}")
-
-            # Creating the settings menu
-
+    # Создание меню настроек
     settings = pm.Menu(title="Настройки",
                        width=WIDTH,
                        height=HEIGHT,
@@ -55,62 +50,80 @@ def main():
                     width=WIDTH,
                     height=HEIGHT,
                     theme=pm.themes.THEME_GREEN)
+    stats.add.label(get_stats())
 
-    # Adjusting the default values
+    # Настройка значений по умолчанию
     settings._theme.widget_font_size = 25
     settings._theme.widget_font_color = BLACK
     settings._theme.widget_alignment = pm.locals.ALIGN_LEFT
 
-    # Text input that takes in the username
+    # Текстовый ввод для имени пользователя
+    # 2 выпадающих списка для выбора уровня графики и разрешения
+    # Переключатели для включения/выключения музыки и звука
+    # Селектор для выбора уровня сложности
+    settings.add.selector(title="Цвет",
+                          items=colors,
+                          selector_id="difficulty",
+                          style="fancy",
+                          default=0)
 
-    # 2 different Drop-downs to select the graphics level and the resolution level
+    # Ползунок для выбора значения с помощью ползунка
+    # Стильный селектор (добавленный к стандартному селектору) для выбора между
+    # видом от первого или третьего лица
+    settings.add.selector(title="Музыка",
+                          items=music,
+                          default=0,
+                          style="fancy",
+                          selector_id="perspective")
 
-    # Toggle switches to turn on/off the music and sound
+    # 3 разные кнопки с разными стилями и назначением
+    settings.add.button(title="Сохранить",
+                        action=print_settings,
+                        font_color=WHITE,
+                        background_color=GREEN)
+    settings.add.button(title="Сброс",
+                        action=settings.reset_value,
+                        font_color=WHITE,
+                        background_color=RED)
 
-    # Selector to choose between the types of difficulties available
-    settings.add.selector(title="Цвет\t", items=colors,
-                          selector_id="difficulty", style="fancy", default=0)
+    # Создание главного меню
+    main_menu = pm.Menu(title="Меню",
+                        width=WIDTH,
+                        height=HEIGHT,
+                        theme=pm.themes.THEME_GREEN)
 
-    # Range slider that lets to choose a value using a slider
+    # Настройка значений по умолчанию
+    main_menu._theme.widget_alignment = pm.locals.ALIGN_CENTER
 
-    # Fancy selector (style added to the default selector) to choose between
-    # first person and third person perspectives
-    settings.add.selector(title="Музыка", items=music,
-                          default=0, style="fancy", selector_id="perspective")
+    # Кнопка, запускающая игру
+    main_menu.add.button(title="Играть",
+                         action=game_loop,
+                         font_color=BLACK,
+                         background_color=GREEN)
 
-    # 3 different buttons each with a different style and purpose
-    settings.add.button(title="Сохранить", action=printSettings,
-                        font_color=WHITE, background_color=GREEN)
-    settings.add.button(title="Сброс", action=settings.reset_value,
-                        font_color=WHITE, background_color=RED)
+    # Кнопка, открывающая меню настроек при клике
+    main_menu.add.button(title="Настройки",
+                         action=settings,
+                         font_color=BLACK,
+                         background_color=GREEN)
 
-    # Creating the main menu
-    mainMenu = pm.Menu(title="Меню",
-                       width=WIDTH,
-                       height=HEIGHT,
-                       theme=pm.themes.THEME_GREEN)
+    # Кнопка, открывающая меню статистики при клике
+    main_menu.add.button(title="Статистика",
+                         action=stats,
+                         font_color=BLACK,
+                         background_color=GREEN)
 
-    # Adjusting the default values
-    mainMenu._theme.widget_alignment = pm.locals.ALIGN_CENTER
+    # Пустая метка, используемая для создания разделителя между двумя кнопками
+    main_menu.add.label(title="")
 
-    mainMenu.add.button(title="Играть", action=gameLoop,
-                        font_color=BLACK, background_color=GREEN)
+    # Кнопка выхода, завершающая программу
+    main_menu.add.button(title="Выход",
+                         action=pm.events.EXIT,
+                         font_color=WHITE,
+                         background_color=RED)
 
-    # Button that takes to the settings menu when clicked
-    mainMenu.add.button(title="Настройки", action=settings,
-                        font_color=BLACK, background_color=GREEN)
-
-    mainMenu.add.button(title="Статистика", action=stats,
-                        font_color=BLACK, background_color=GREEN)
-    # An empty label that is used to add a seperation between the two buttons
-    mainMenu.add.label(title="")
-
-    # Exit button that is used to terminate the program
-    mainMenu.add.button(title="Выход", action=pm.events.EXIT,
-                        font_color=WHITE, background_color=RED)
-
-    # Lets us loop the main menu on the screen
-    mainMenu.mainloop(screen)
+    # Запуск главного меню на экране
+    main_menu.mainloop(screen)
 
 
 if __name__ == "__main__":
