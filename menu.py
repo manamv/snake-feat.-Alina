@@ -1,6 +1,6 @@
 import pygame
 import pygame_menu as pm
-from main import game_loop, get_stats
+import game
 import pygame.mixer
 
 # Импортирование и инициализация Pygame
@@ -19,16 +19,17 @@ WHITE = (255, 255, 255)
 
 # Главная функция программы
 def main():
+    pygame.display.set_caption('Меню')
     pygame.mixer.init()
     pygame.mixer.music.load('music/menuau.mp3')
     pygame.mixer.music.play(-1)
 
-    # Список, который отображается при выборе сложности
+    # скины
     colors = [("Черный", "Черный"),
               ("Розовый", "Розовый"),
               ("Фиолетовый", "Фиолетовый")]
 
-    # Список, который отображается при выборе перспективы игрока
+    # музыка
     music = [("1", "1"),
              ("2", "2"),
              ("3", "3")]
@@ -50,33 +51,25 @@ def main():
                     width=WIDTH,
                     height=HEIGHT,
                     theme=pm.themes.THEME_GREEN)
-    stats.add.label(get_stats())
+    stats.add.label(game.get_stats())
 
     # Настройка значений по умолчанию
     settings._theme.widget_font_size = 25
     settings._theme.widget_font_color = BLACK
     settings._theme.widget_alignment = pm.locals.ALIGN_LEFT
 
-    # Текстовый ввод для имени пользователя
-    # 2 выпадающих списка для выбора уровня графики и разрешения
-    # Переключатели для включения/выключения музыки и звука
-    # Селектор для выбора уровня сложности
     settings.add.selector(title="Цвет",
                           items=colors,
                           selector_id="difficulty",
                           style="fancy",
                           default=0)
 
-    # Ползунок для выбора значения с помощью ползунка
-    # Стильный селектор (добавленный к стандартному селектору) для выбора между
-    # видом от первого или третьего лица
     settings.add.selector(title="Музыка",
                           items=music,
                           default=0,
                           style="fancy",
                           selector_id="perspective")
 
-    # 3 разные кнопки с разными стилями и назначением
     settings.add.button(title="Сохранить",
                         action=print_settings,
                         font_color=WHITE,
@@ -86,18 +79,16 @@ def main():
                         font_color=WHITE,
                         background_color=RED)
 
-    # Создание главного меню
     main_menu = pm.Menu(title="Меню",
                         width=WIDTH,
                         height=HEIGHT,
                         theme=pm.themes.THEME_GREEN)
 
-    # Настройка значений по умолчанию
     main_menu._theme.widget_alignment = pm.locals.ALIGN_CENTER
 
     # Кнопка, запускающая игру
     main_menu.add.button(title="Играть",
-                         action=game_loop,
+                         action=game.game_loop,
                          font_color=BLACK,
                          background_color=GREEN)
 
