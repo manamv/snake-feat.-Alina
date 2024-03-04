@@ -51,7 +51,7 @@ class Cell:
         self.x = x
         self.y = y
 
-
+# игра
 def main():
     global FPS_CLOCK
     global DISPLAY
@@ -118,6 +118,7 @@ def run_game():
         FPS_CLOCK.tick(FPS)
 
 
+# нарисовать поле
 def draw_frame(snake, apple):
     global FPS
     global POINTS
@@ -138,6 +139,7 @@ def draw_frame(snake, apple):
     pygame.display.update()
 
 
+# отрисовка сетки
 def draw_grid():
     for x in range(0, WINDOW_WIDTH, CELL_SIZE):
         pygame.draw.line(DISPLAY, GRID_COLOR, (x, 0), (x, WINDOW_HEIGHT))
@@ -145,10 +147,12 @@ def draw_grid():
         pygame.draw.line(DISPLAY, GRID_COLOR, (0, y), (WINDOW_WIDTH, y))
 
 
+# добавить яблоко
 def draw_apple(apple):
     draw_cell(apple, APPLE_OUTER_COLOR, APPLE_COLOR)
 
 
+# отрисовка змейки
 def draw_snake(snake):
     for coord in snake:
         draw_cell(coord, SNAKE_OUTER_COLOR, SNAKE_COLOR)
@@ -161,6 +165,7 @@ def draw_cell(cell, outer_color, inner_color):
     pygame.draw.rect(DISPLAY, outer_color, cell, 4)
 
 
+# движение змейки
 def move_snake(snake, direction):
     for cell in snake:
         if cell == snake[0]:

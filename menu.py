@@ -62,17 +62,17 @@ def main():
     settings._theme.widget_font_color = BLACK
     settings._theme.widget_alignment = pm.locals.ALIGN_LEFT
 
-    settings.add.selector(title="Цвет",
-                          items=colors,
-                          selector_id="color",
-                          style="fancy",
-                          default=0)
+    color = settings.add.selector(title="Цвет",
+                                  items=colors,
+                                  selector_id="color",
+                                  style="fancy",
+                                  default=0)
 
-    settings.add.selector(title="Музыка",
-                          items=music,
-                          default=0,
-                          style="fancy",
-                          selector_id="music")
+    mus_sound = settings.add.selector(title="Музыка",
+                                      items=music,
+                                      default=0,
+                                      style="fancy",
+                                      selector_id="music")
 
     settings.add.button(title="Сохранить",
                         action=print_settings,

@@ -4,6 +4,7 @@ import sqlite3
 import menu
 
 
+# меню конца игры
 def game_over():
     pygame.init()
     screen_width = 640
