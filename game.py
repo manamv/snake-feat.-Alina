@@ -41,7 +41,7 @@ POINTS = 0
 conn = sqlite3.connect('scores.db')
 cursor = conn.cursor()
 cursor.execute('SELECT MAX(score) FROM scores')
-HIGHSCORE = cursor.fetchone()[0]
+HIGHSCORE = int(cursor.fetchone()[0])
 cursor.close()
 conn.close()
 
