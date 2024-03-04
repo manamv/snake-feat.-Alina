@@ -98,9 +98,9 @@ def run_game():
         global POINTS
         global good_sound
         if snake_hit_self(snake) or snake_hit_edge(snake):
-            ending.game_over()
             FPS = 5
             POINTS = 0
+            ending.game_over()
             break
         if snake_hit_apple(snake, applepos):
             good_sound.play()
